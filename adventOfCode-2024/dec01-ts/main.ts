@@ -18,33 +18,32 @@ export async function readFileNumberNumber(
   return [column1, column2];
 }
 
+/**
+ * @throws {Error} If arrays have different lengths
+ */
 export function distance(
-  list1: number[],
-  list2: number[]
+  list1: readonly number[],
+  list2: readonly number[]
 ): number {
-  let distance = 0;
-  for(let idx=0; idx < list1.length; idx++) {
-    distance += Math.abs(list1[idx] - list2[idx]);
+  if (list1.length !== list2.length) {
+    throw new Error('Arrays must have equal length');
   }
-  return distance;
+
+  return list1.reduce((sum, val, idx) => 
+    sum + Math.abs(val - list2[idx]), 0);
 }
 
 export function similarity(
-  list1: number[],
-  list2: number[]
+  list1: readonly number[],
+  list2: readonly number[]
 ): number {
-  const isValue = (val:number) => {
-    return (num:number) => num === val;
-  }
-  let similarity = 0;
-  list1.forEach(l1Number => {
-    const firstIdx = list2.findIndex(isValue(l1Number));
-    if (firstIdx === -1) return;
-    const secondIdx = list2.findLastIndex(isValue(l1Number));
-    similarity += l1Number * (secondIdx - firstIdx + 1);
-  });
-
-  return similarity;
+  return list1.reduce((total, currentNum) => {
+    const firstIdx = list2.indexOf(currentNum);
+    if (firstIdx === -1) return total;
+    
+    const lastIdx = list2.lastIndexOf(currentNum);
+    return total + currentNum * (lastIdx - firstIdx + 1);
+  }, 0);
 }
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
