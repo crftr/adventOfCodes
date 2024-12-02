@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { readFileNumberNumber, distance, similarity } from "./main.ts";
+import { distance, readFileNumberNumber, similarity } from "./main.ts";
 
 Deno.test(async function listDistance() {
   const [list1, list2] = await readFileNumberNumber("./1_test.txt");
@@ -10,5 +10,5 @@ Deno.test(async function listDistance() {
 Deno.test(async function listSimilarity() {
   const [list1, list2] = await readFileNumberNumber("./1_test.txt");
   const similarityValue = similarity(list1, list2);
-  assertEquals(similarityValue, 31)
-})
+  assertEquals(similarityValue, 31);
+});
