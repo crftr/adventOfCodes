@@ -37,25 +37,33 @@ export async function readFileOfReports(
   }, [] as number[][]);
 }
 
+function isSafeReport(report: number[]): boolean {
+  if (report.length < 2) return true;
+  const diffs = getDiffs(report);
+  const changeOk = isChangingInAcceptableRange(diffs);
+  const directionOk = isConsistentDirection(diffs);
+
+  return (changeOk && directionOk);
+}
+
 export function safeReportCount(
   reportArray: readonly number[][],
+  dampen: boolean = false,
 ): number {
   return reportArray.reduce((safeCount, report) => {
     if (report.length < 2) return safeCount;
 
-    const diffs = getDiffs(report);
-    const changeOk = isChangingInAcceptableRange(diffs);
-    const directionOk = isConsistentDirection(diffs);
+    const possibleReports = [report];
 
-    if (changeOk && directionOk) {
-      safeCount++;
+    if (dampen) {
+      report.forEach((_level, levelIdx) => {
+        possibleReports.push(report.toSpliced(levelIdx, 1));
+      });
     }
 
-    console.log(
-      diffs,
-      isChangingInAcceptableRange(diffs),
-      isConsistentDirection(diffs),
-    );
+    if (possibleReports.some(isSafeReport)) {
+      safeCount++;
+    }
 
     return safeCount;
   }, 0);
@@ -66,5 +74,8 @@ if (import.meta.main) {
   const reports = await readFileOfReports("./2_input.txt");
 
   const safeCount = safeReportCount(reports);
-  console.log("Part 1", safeCount);
+  console.log("Part 1: ", safeCount);
+
+  const dampenedCount = safeReportCount(reports, true);
+  console.log("Part 2: ", dampenedCount);
 }
